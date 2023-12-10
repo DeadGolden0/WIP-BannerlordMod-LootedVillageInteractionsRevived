@@ -1,7 +1,7 @@
 ﻿using System;
 using TaleWorlds.CampaignSystem;
 
-namespace Looted_Village_Interactions_Revived
+namespace LootedVillageInteractionsRevived
 {
     public partial class LVIBehavior : CampaignBehaviorBase
     {
@@ -12,7 +12,6 @@ namespace Looted_Village_Interactions_Revived
 
         public override void SyncData(IDataStore dataStore)
         {
-            throw new System.NotImplementedException();
         }
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
