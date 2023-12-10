@@ -8,15 +8,15 @@ namespace Looted_Village_Interactions_Revived
     {
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
-            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_investigate_option", "{=LVI_Investigate}Investigate", 
+            campaignGameStarter.AddGameMenuOption("village", "lvi_investigate_option", "{=LVI_Investigate}Investigate", 
                 new GameMenuOption.OnConditionDelegate(this.LVI_Investigate_Condition), 
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Investigate_Consequence), false, 2, false, null);
 
-            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_help_option", "{=LVI_Help}Help Village",
+            campaignGameStarter.AddGameMenuOption("village", "lvi_help_option", "{=LVI_Help}Help Village",
                 new GameMenuOption.OnConditionDelegate(this.LVI_Help_Condition),
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Help_Consequence), false, 2, false, null);
 
-            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_pillage_option", "{=LVI_Pillage}Start Pillage ",
+            campaignGameStarter.AddGameMenuOption("village", "lvi_pillage_option", "{=LVI_Pillage}Start Pillage ",
                 new GameMenuOption.OnConditionDelegate(this.LVI_Pillage_Condition),
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Pillage_Consequence), false, 2, false, null);
 
