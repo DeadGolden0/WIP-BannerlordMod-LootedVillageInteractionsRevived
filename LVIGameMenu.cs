@@ -16,7 +16,7 @@ namespace Looted_Village_Interactions_Revived
                 new GameMenuOption.OnConditionDelegate(this.LVI_Help_Condition),
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Help_Consequence), false, 2, false, null);
 
-            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_pillage_option", "{=LVI_Pillage}Start Pillage",
+            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_pillage_option", "{=LVI_Pillage}Start Pillage ",
                 new GameMenuOption.OnConditionDelegate(this.LVI_Pillage_Condition),
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Pillage_Consequence), false, 2, false, null);
 
