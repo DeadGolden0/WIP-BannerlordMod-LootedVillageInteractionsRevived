@@ -1,5 +1,7 @@
 ﻿using System;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.GauntletUI.Data;
 
 namespace LootedVillageInteractionsRevived
 {
@@ -18,5 +20,9 @@ namespace LootedVillageInteractionsRevived
         {
             this.AddGameMenus(campaignGameStarter);
         }
+
+        private static GauntletLayer? _gauntletLayer;
+        private static GauntletMovie? _gauntletMovie;
+        private static LVIPopupVM? _popupVM;
     }
 }
