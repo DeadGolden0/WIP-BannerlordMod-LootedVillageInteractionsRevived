@@ -1,7 +1,9 @@
 ﻿using System;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.GauntletUI.Data;
 
-namespace Looted_Village_Interactions_Revived
+namespace LootedVillageInteractionsRevived
 {
     public partial class LVIBehavior : CampaignBehaviorBase
     {
@@ -12,12 +14,15 @@ namespace Looted_Village_Interactions_Revived
 
         public override void SyncData(IDataStore dataStore)
         {
-            throw new System.NotImplementedException();
         }
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
             this.AddGameMenus(campaignGameStarter);
         }
+
+        private static GauntletLayer? _gauntletLayer;
+        private static GauntletMovie? _gauntletMovie;
+        private static LVIPopupVM? _popupVM;
     }
 }

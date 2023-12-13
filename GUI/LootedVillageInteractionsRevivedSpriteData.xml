@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<SpriteData>
+  <SpriteCategories>
+    <SpriteCategory>
+      <Name>ui_banner_menu</Name>
+      <AlwaysLoad />
+      <SpriteSheetCount>1</SpriteSheetCount>
+      <SpriteSheetSize ID="1" Width="4096" Height="2048" />
+    </SpriteCategory>
+  </SpriteCategories>
+  <SpriteParts>
+    <SpritePart>
+      <SheetID>1</SheetID>
+      <Name>lvi_helping_1</Name>
+      <Width>1024</Width>
+      <Height>1792</Height>
+      <SheetX>4</SheetX>
+      <SheetY>4</SheetY>
+      <CategoryName>ui_banner_menu</CategoryName>
+    </SpritePart>
+    <SpritePart>
+      <SheetID>1</SheetID>
+      <Name>lvi_helping_2</Name>
+      <Width>1024</Width>
+      <Height>1792</Height>
+      <SheetX>1036</SheetX>
+      <SheetY>4</SheetY>
+      <CategoryName>ui_banner_menu</CategoryName>
+    </SpritePart>
+  </SpriteParts>
+  <Sprites>
+    <GenericSprite>
+      <Name>lvi_helping_1</Name>
+      <SpritePartName>lvi_helping_1</SpritePartName>
+    </GenericSprite>
+    <GenericSprite>
+      <Name>lvi_helping_2</Name>
+      <SpritePartName>lvi_helping_2</SpritePartName>
+    </GenericSprite>
+  </Sprites>
+</SpriteData>

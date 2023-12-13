@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LootedVillageInteractionsRevived", "LootedVillageInteractionsRevived.csproj", "{F732CDF6-66FB-403C-981B-9F919503F8B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F732CDF6-66FB-403C-981B-9F919503F8B0}.Debug|x64.ActiveCfg = Debug|x64
+		{F732CDF6-66FB-403C-981B-9F919503F8B0}.Debug|x64.Build.0 = Debug|x64
+		{F732CDF6-66FB-403C-981B-9F919503F8B0}.Release|x64.ActiveCfg = Release|x64
+		{F732CDF6-66FB-403C-981B-9F919503F8B0}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B995FBF4-239B-48F1-B564-F34B483D405A}
+	EndGlobalSection
+EndGlobal

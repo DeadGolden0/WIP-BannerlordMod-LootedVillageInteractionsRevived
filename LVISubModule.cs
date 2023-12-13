@@ -5,7 +5,7 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
 
-namespace Looted_Village_Interactions_Revived
+namespace LootedVillageInteractionsRevived
 {
     public class LVISubModule : MBSubModuleBase
     {
@@ -21,25 +21,27 @@ namespace Looted_Village_Interactions_Revived
 
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
         {
-            InformationManager.DisplayMessage(new InformationMessage("[LVI] Mod Loaded !", LVISubModule.Ini_Color));
+            InformationManager.DisplayMessage(new InformationMessage("[LVIR] Mod Loaded !", LVISubModule.Ini_Color));
         }
 
         protected override void InitializeGameStarter(Game game, IGameStarter gameStarterObject)
         {
-
-            base.InitializeGameStarter(game, gameStarterObject);
-            if (gameStarterObject is CampaignGameStarter starter && game.GameType is Campaign)
+            try
             {
-                ((CampaignGameStarter)gameStarterObject).AddBehavior((CampaignBehaviorBase)new LVIBehavior());
+                base.InitializeGameStarter(game, gameStarterObject);
+                if (gameStarterObject is CampaignGameStarter starter)
+                {
+                    starter.AddBehavior(new LVIBehavior());
+                }
+            }
+            catch (Exception ex)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("[LVIR] Error Initializing Game Starter: " + ex.Message, LVISubModule.Dbg_Color));
             }
         }
-
-        private static readonly bool DebugMode = true;
 
         private static readonly Color Ini_Color = Color.FromUint(7194750U);
 
         public static readonly Color Dbg_Color = Color.FromUint(16005134U);
-
-
     }
 }
