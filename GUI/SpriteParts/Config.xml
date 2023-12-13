@@ -1,0 +1,5 @@
+<Config>
+    <SpriteCategory Name="ui_banner_menu">
+        <AlwaysLoad/>
+    </SpriteCategory>
+</Config>

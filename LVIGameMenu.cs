@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -6,6 +8,7 @@ using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Overlay;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
@@ -23,7 +26,7 @@ namespace LootedVillageInteractionsRevived
                 new GameMenuOption.OnConditionDelegate(this.LVI_Investigate_Condition), 
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Investigate_Consequence), false, 3, false, null);
 
-            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_help_option", "{=LVI_Help}Help Village ({GOLD_TO_HELP}{GOLD_ICON} / Hours)",
+            campaignGameStarter.AddGameMenuOption("village_looted", "lvi_help_option", "{=LVI_Help}Help Village ({GOLD_TO_HELP}{GOLD_ICON})",
                 new GameMenuOption.OnConditionDelegate(this.LVI_Help_Condition),
                 new GameMenuOption.OnConsequenceDelegate(this.LVI_Help_Consequence), false, 2, false, null);
 
@@ -46,11 +49,10 @@ namespace LootedVillageInteractionsRevived
         }
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // Investigate Menu Option (LVI) - Condition & Consequence
+        // Investigate Menu Option (LVIR) - Condition & Consequence
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         private bool LVI_Investigate_Condition(MenuCallbackArgs args)
         {
-            // A DEV
             args.optionLeaveType = GameMenuOption.LeaveType.Conversation;
             return true;
         }
@@ -60,15 +62,17 @@ namespace LootedVillageInteractionsRevived
         }
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // Help Menu Option (LVI) - Condition & Consequence
+        // Help Menu Option (LVIR) - Condition & Consequence
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // HELP MENU - HELP OPTION
         private bool LVI_Help_Condition(MenuCallbackArgs args)
         {
-            args.optionLeaveType = GameMenuOption.LeaveType.DefendAction;
-            MBTextManager.SetTextVariable("GOLD_TO_HELP", _helpingPrice);
+            _currentHelpCost = CalculateHelpingCost();
 
-            if (LVISubModule.DebugMode)
+            args.optionLeaveType = GameMenuOption.LeaveType.DefendAction;
+            MBTextManager.SetTextVariable("GOLD_TO_HELP", _currentHelpCost);
+
+            if (LVIConfig.DebugMode)
             {
                 args.Tooltip = new TextObject("{=LVI_DebugMod}DebugMode Activated", null);
                 args.IsEnabled = true;
@@ -79,7 +83,7 @@ namespace LootedVillageInteractionsRevived
                 args.Tooltip = new TextObject("{=LVI_Cant_help}It would not be wise to help an enemy village", null);
                 args.IsEnabled = false;
             }
-            if (!PlayerHasEnoughGold(_helpingPrice))
+            if (!PlayerHasEnoughGold(_currentHelpCost))
             {
                 args.Tooltip = new TextObject("{=LVI_Not_Enought_Money}You don't have enough money to help this village.", null);
                 args.IsEnabled = false;
@@ -90,6 +94,8 @@ namespace LootedVillageInteractionsRevived
         private void LVI_Help_Consequence(MenuCallbackArgs args)
         {
             _lastHourOfHelping = -10;
+
+            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, -_currentHelpCost, false);
             GameMenu.SwitchToMenu("lvi_help_wait_menu");
         }
 
@@ -97,7 +103,7 @@ namespace LootedVillageInteractionsRevived
         private void LVI_Help_Wait_Menu_Init(MenuCallbackArgs args)
         {
             // Définir l'image de fond du menu si nécessaire
-            args.MenuContext.SetBackgroundMeshName("book_menu_sprite6");
+            args.MenuContext.SetBackgroundMeshName("lvi_helping_2");
 
             MBTextManager.SetTextVariable("VILLAGE_NAME", PlayerEncounter.EncounterSettlement.Name, false);
 
@@ -112,20 +118,35 @@ namespace LootedVillageInteractionsRevived
 
         private void LVI_Help_Wait_Menu_Consequence(MenuCallbackArgs args)
         {
-            if (_canHelpVillager >= 100) _canHelpVillager = 0;
-            float clanRenown = Clan.PlayerClan.Renown;
-            int renownGain = MBRandom.RandomInt(this.minRenownWin, this.maxRenownWin);
-            Clan.PlayerClan.Renown = clanRenown - (float)renownGain;
+            Random random = new Random();
+            _canHelpVillager = 0;
+            IncreaseSettlementHealthAction.Apply(PlayerEncounter.EncounterSettlement, 1f);
 
-            // EXPERIMENTAL
-            CreatePopupVMLayer("{VILLAGE_NAME}", "TEST1", "{=LVI_Finish_Help}You have successfully helped the people of {VILLAGE_NAME} escape their dire situation. As a result, your clan {PLAYER_CLAN} earned {RENOW_EARN} points of renown", "TEST2", "lt_education_popup2", "Continue");
+            // Utilisation unique de MBRandom pour le gain de renommée et de relation
+            int renownGain = random.Next(LVIConfig.HelpMinRenowGain, LVIConfig.HelpMaxRenowGain);
+            int relationGain = random.Next(LVIConfig.HelpMinRelationGain, LVIConfig.HelpMaxRelationGain);
 
+            Clan.PlayerClan.Renown -= renownGain;
             SoundEvent.PlaySound2D("event:/ui/notification/peace");
-            //TextObject eventText = new TextObject("{=LVI_Finish_Help}You have successfully helped the people of {VILLAGE_NAME} escape their dire situation. As a result, your clan {PLAYER_CLAN} earned {RENOW_EARN} points of renown", null)
-            //    .SetTextVariable("VILLAGE_NAME", PlayerEncounter.EncounterSettlement.Name)
-            //    .SetTextVariable("PLAYER_CLAN", Clan.PlayerClan.Name.ToString())
-            //    .SetTextVariable("RENOW_EARN", renownGain);
-            //MBInformationManager.AddQuickInformation(eventText, 1000, Hero.MainHero.CharacterObject, null);
+
+            // Récupération du leader et des notables une seule fois
+            IEnumerable<Hero> notables = PlayerEncounter.EncounterSettlement.Notables;
+
+            // Préparation du message d'information
+            string villageName = PlayerEncounter.EncounterSettlement.Name.ToString();
+            string playerClanName = Clan.PlayerClan.Name.ToString();
+            TextObject eventText = new TextObject("{=LVI_Finish_Help}Assistance to {VILLAGE_NAME} was a resounding success! Your clan, {PLAYER_CLAN}, has gained {RENOW_EARN} renown. Relations with the village's influential figures have been significantly bolstered.", null)
+                .SetTextVariable("VILLAGE_NAME", villageName)
+                .SetTextVariable("PLAYER_CLAN", playerClanName)
+                .SetTextVariable("RENOW_EARN", renownGain);
+            MBInformationManager.AddQuickInformation(eventText, 5000, Hero.MainHero.CharacterObject, null);
+
+
+            // Gain de relation avec les notables
+            foreach (Hero notable in notables)
+            {
+                ChangeRelationAction.ApplyPlayerRelation(notable, relationGain);
+            }
 
             GameMenu.SwitchToMenu("village");
         }
@@ -135,27 +156,16 @@ namespace LootedVillageInteractionsRevived
             int hour = (int)CampaignTime.Now.CurrentHourInDay;
             if (_lastHourOfHelping != -10 && _lastHourOfHelping != hour)
             {
-                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, -_helpingPrice, false);
-
                 _canHelpVillager += HealpingPerHourProgress();
             }
             _lastHourOfHelping = hour;
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu((float)_canHelpVillager / 100);
 
-            if (Hero.MainHero.Gold < _helpingPrice)
-            {
-                TextObject eventText = new TextObject("{=LVI_Help_Not_Enought_Money}You no longer have enough money to continue helping this village.", null);
-                MBInformationManager.AddQuickInformation(eventText, 1000, Hero.MainHero.CharacterObject, null);
-
-                args.MenuContext.GameMenu.EndWait();
-                GameMenu.SwitchToMenu("village_looted");
-            }
-
             // Afficher le débogage si nécessaire.
-            if (LVISubModule.DebugMode)
+            if (LVIConfig.DebugMode)
             {
-                InformationManager.DisplayMessage(new InformationMessage("[LVI DebugMod] Progress : " + (float)_canHelpVillager / 100, LVISubModule.Dbg_Color));
+                InformationManager.DisplayMessage(new InformationMessage("[LVIR DebugMod] Progress : " + (float)_canHelpVillager / 100, LVISubModule.Dbg_Color));
             }
 
         }
@@ -173,7 +183,7 @@ namespace LootedVillageInteractionsRevived
         }
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // Pillage Menu Option (LVI) - Condition & Consequence
+        // Pillage Menu Option (LVIR) - Condition & Consequence
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         private bool LVI_Pillage_Condition(MenuCallbackArgs args)
@@ -189,7 +199,7 @@ namespace LootedVillageInteractionsRevived
 
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // Other Functions (LVI) 
+        // Other Functions (LVIR) 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         private float HealpingPerHourProgress()
         {
@@ -204,15 +214,30 @@ namespace LootedVillageInteractionsRevived
             return Hero.MainHero.Gold >= value;
         }
 
+        private int CalculateHelpingCost()
+        {
+            Random random = new Random();
+
+            int numberOfSoldiers = MobileParty.MainParty.MemberRoster.TotalManCount;
+            int cost;
+
+            if (numberOfSoldiers > LVIConfig.HelpMinSoldierPourcentage)
+            {
+                cost = random.Next(LVIConfig.HelpMinCost, LVIConfig.HelpMinCost + (LVIConfig.HelpMaxCost - LVIConfig.HelpMinCost) / 2);
+            }
+            else
+            {
+                cost = random.Next(LVIConfig.HelpMinCost, LVIConfig.HelpMaxCost);
+            }
+
+            return cost;
+        }
+
 
         private int _lastHourOfHelping;
 
         private float _canHelpVillager;
 
-        private int _helpingPrice = 15;
-
-        private int minRenownWin = 10;
-
-        private int maxRenownWin = 50;
+        private int _currentHelpCost;
     }
 }

@@ -21,7 +21,7 @@ namespace LootedVillageInteractionsRevived
 
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
         {
-            InformationManager.DisplayMessage(new InformationMessage("[LVI] Mod Loaded !", LVISubModule.Ini_Color));
+            InformationManager.DisplayMessage(new InformationMessage("[LVIR] Mod Loaded !", LVISubModule.Ini_Color));
         }
 
         protected override void InitializeGameStarter(Game game, IGameStarter gameStarterObject)
@@ -36,11 +36,9 @@ namespace LootedVillageInteractionsRevived
             }
             catch (Exception ex)
             {
-                InformationManager.DisplayMessage(new InformationMessage("[LVI] Error Initializing Game Starter: " + ex.Message, LVISubModule.Dbg_Color));
+                InformationManager.DisplayMessage(new InformationMessage("[LVIR] Error Initializing Game Starter: " + ex.Message, LVISubModule.Dbg_Color));
             }
         }
-
-        public static readonly bool DebugMode = true;
 
         private static readonly Color Ini_Color = Color.FromUint(7194750U);
 

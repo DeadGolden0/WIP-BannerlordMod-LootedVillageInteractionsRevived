@@ -37,7 +37,7 @@ namespace LootedVillageInteractionsRevived
 
                         _popupVM = new LVIPopupVM(titleTO.ToString(), smallTextTO.ToString(), bigTextTO.ToString(), textOverImageTO.ToString(), spriteName, closeButtonTextTO.ToString());
                     }
-                    _gauntletMovie = (GauntletMovie)_gauntletLayer.LoadMovie("LTEducationBookPopup", _popupVM);
+                    _gauntletMovie = (GauntletMovie)_gauntletLayer.LoadMovie("ui_banner_menu", _popupVM);
                     _gauntletLayer.InputRestrictions.SetInputRestrictions(true, InputUsageMask.All);
                     ScreenManager.TopScreen.AddLayer(_gauntletLayer);
                     _gauntletLayer.IsFocusLayer = true;
@@ -47,6 +47,7 @@ namespace LootedVillageInteractionsRevived
             }
             catch (Exception ex)
             {
+                InformationManager.DisplayMessage(new InformationMessage("[LVIR] Error Creating PopupVM Layer: " + ex.Message, LVISubModule.Dbg_Color));
             }
         }
 
